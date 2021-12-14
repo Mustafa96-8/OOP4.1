@@ -10,7 +10,7 @@ namespace OOP4._1
         {
             return 'B';
         }
-	    public virtual void print()
+	    public virtual void print(int i,Graphics gr)
         {
 
         }
@@ -134,17 +134,6 @@ namespace OOP4._1
                 
             Console.WriteLine("\tЭлемент удален\n");
         }
-        public void print()
-        {
-            Console.WriteLine("Вывод хранилища:\n[\n");
-            Node current = first;
-            while (!(current.isEOL()))
-            {
-                current.base_.print();
-                current = current.next;
-            }
-            Console.WriteLine("]\n");
-        }
         public int getSize()
         {
             if (first == null) return 0;
@@ -197,22 +186,47 @@ namespace OOP4._1
 
     public class CCircle : Base
     {
+        
+        Pen blackpen;
+        Pen redpen;
+        Pen darkGoldpen;
+        
+        Font font_;
+        Brush br;
+        PointF point;
+
+
+        Random rand = new Random();
         private int x, y;
-        private int R = 15;
-        public bool Selected = false;
+        private int R=10;
+        public bool Selected;
         public override char getCode()
         {
             return 'C';
         }
+        public void initcomp()
+        {
+            blackpen = new Pen(Color.Black);
+            blackpen.Width = 2;
+            redpen = new Pen(Color.Red);
+            redpen.Width = 2;
+            darkGoldpen = new Pen(Color.DarkGoldenrod);
+            darkGoldpen.Width = 2;
+            font_ = new Font("Arial", 10);
+            br = Brushes.Black;
+        }
 
         public CCircle(int x, int y,Mylist mylist)
         {
+
+            initcomp();
+            R = rand.Next(10, 40);
             bool flag = true;
             int i;
             double tmp = 0 ;
             for ( i=1; i < mylist.getSize()+1; i++)
             {
-                tmp = Math.Pow((((CCircle)mylist.getObj(i)).getX() - x), 2) + Math.Pow(((CCircle)mylist.getObj(i)).getY() - y, 2);
+                tmp = Math.Pow((((CCircle)mylist.getObj(i)).x - x), 2) + Math.Pow(((CCircle)mylist.getObj(i)).y - y, 2);
                 if (tmp <= (4*R*R))
                 {
                     flag = false;
@@ -224,102 +238,57 @@ namespace OOP4._1
             {
                 this.x = x;
                 this.y = y;
+                this.Selected = true;
                 mylist.add(this);
+                if (mylist.getSize() > 2)
+                {
+                    ((CCircle)mylist.getObj(mylist.getSize() - 1)).Selected = false;
+                }
             }
             else
             {
                 if (tmp < R * R)
                 {
+                    
                     ((CCircle)mylist.getObj(i)).Selected = true;
                 }
             }
         }
         public CCircle(CCircle copy)
         {
-            x = copy.getX();
-            y = copy.getY();
-        }
-        public int getX()
-        {
-            return x;
-        }
-        public int getY()
-        {
-            return y;
-        }
-        public int getR()
-        {
-            return R;
-        }
-    }
-
-    class Paint
-    {
-        Bitmap bitmap;
-        Pen blackpen;
-        Pen redpen;
-        Pen darkGoldpen;
-        Graphics gr;
-        Font font_;
-        Brush br;
-        PointF point;
-
-        public int R = 15;
-        
-        public Paint(int width, int height)
-        {
-            bitmap = new Bitmap(width, height);
-            gr = Graphics.FromImage(bitmap);
-            clearSheet();
-            blackpen = new Pen(Color.Black);
-            blackpen.Width = 2;
-            redpen = new Pen(Color.Red);
-            redpen.Width = 2;
-            darkGoldpen = new Pen(Color.DarkGoldenrod);
-            darkGoldpen.Width = 2;
-            font_ = new Font("Arial", 10);
+            initcomp();
             br = Brushes.Black;
+            R = rand.Next(20, 20);
+            x = copy.x;
+            y = copy.y;
+            Selected = copy.Selected;
         }
 
-        public void clearSheet()
+        public void clearSheet(Graphics gr)
         {
             gr.Clear(Color.White);
         }
 
-        public Bitmap GetBitmap()
-        {
-            return bitmap;
-        }
 
-        public void drawCircle(int x, int y, string Num)
+        public void drawCircle(int x, int y, string Num, Graphics gr)
         {
             gr.FillEllipse(Brushes.White, (x - R), (y - R), 2 * R, 2 * R);
             gr.DrawEllipse(blackpen, (x - R), (y - R), 2 * R, 2 * R);
             point = new PointF(x - (R / 2), y - (R / 2));
             gr.DrawString(Num, font_, br, point);
         }
-
-        public void drawSelectedVert(int x, int y)
+        
+        public void drawSelectedVert(int x, int y, Graphics gr)
         {
             gr.DrawEllipse(redpen, (x - R), (y - R), 2 * R, 2 * R);
         }
-
-        public void PaintDraw(Mylist mylist)
-        //отрисовка всех объектов
+        public override void print(int i, Graphics gr) 
         {
-            if (mylist.getSize() == 0) 
-                return;
-            for (int i = 1; i <=mylist.getSize(); i++)
+            drawCircle(x,y,(i+1).ToString(),gr);
+            if (Selected)
             {
-                R = ((CCircle)mylist.getObj(i)).getR();
-                drawCircle(((CCircle)mylist.getObj(i)).getX(),((CCircle)mylist.getObj(i)).getY(),(i-1).ToString());
-                if (((CCircle)mylist.getObj(i)).Selected)
-                {
-                    drawSelectedVert(((CCircle)mylist.getObj(i)).getX(), ((CCircle)mylist.getObj(i)).getY());
-                }
+                drawSelectedVert(x,y,gr);
             }
-            
         }
-
     }
 };
