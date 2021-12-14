@@ -1,24 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
-using System.Drawing.Drawing2D;
 
 
 namespace OOP4._1
 {
     public class Base
     {
-		protected char code = 'B';
 		public virtual char getCode()
         {
-            return code;
+            return 'B';
         }
 	    public virtual void print()
         {
@@ -30,16 +20,16 @@ namespace OOP4._1
         private const char V = 'C';
 
         public MyBaseFactory() { }
-		public Base createBase(char code, Base p)
+		public Base createBase(Base p)
 		{
 			Base _base = null;
-			switch (code)
+			switch (p.getCode())
 			{
                 case 'C':
 					_base = new CCircle((CCircle)p);
 					break;
 				default:
-					break;
+                    break;
 			}
 			return _base;
 		} 
@@ -58,7 +48,7 @@ namespace OOP4._1
             public Node(Base _base)
             {
                 MyBaseFactory factory = new MyBaseFactory();
-                base_ = factory.createBase(_base.getCode(), _base);
+                base_ = factory.createBase(_base);
             }
 
             public bool isEOL() { return Convert.ToBoolean(this == null ? 1 : 0); }
@@ -157,10 +147,10 @@ namespace OOP4._1
         }
         public int getSize()
         {
-            if (isEmpty()) return 0;
+            if (first == null) return 0;
             Node node = first;
             int i = 1;
-            while (!node.next.isEOL())
+            while (node!=null)
             {
                 i++;
                 node = node.next;
@@ -197,7 +187,7 @@ namespace OOP4._1
             Base ret = getObj(i);
             Base tmp;
             MyBaseFactory factory = new MyBaseFactory();
-            tmp = factory.createBase(ret.getCode(), ret);
+            tmp = factory.createBase(ret);
             deleteObj(ret);
             Console.WriteLine("\tОбъект передан\n");
             return tmp;
@@ -208,40 +198,62 @@ namespace OOP4._1
     public class CCircle : Base
     {
         private int x, y;
-        private int R = 10;
-        private new char code = 'C';
-
-        public CCircle(int x, int y)
+        private int R = 15;
+        public bool Selected = false;
+        public override char getCode()
         {
+            return 'C';
+        }
 
-            this.x = x;
-            this.y = y;
+        public CCircle(int x, int y,Mylist mylist)
+        {
+            bool flag = true;
+            int i;
+            double tmp = 0 ;
+            for ( i=1; i < mylist.getSize()+1; i++)
+            {
+                tmp = Math.Pow((((CCircle)mylist.getObj(i)).getX() - x), 2) + Math.Pow(((CCircle)mylist.getObj(i)).getY() - y, 2);
+                if (tmp <= (4*R*R))
+                {
+                    flag = false;
+                    
+                    break;
+                } 
+            }
+            if (flag)
+            {
+                this.x = x;
+                this.y = y;
+                mylist.add(this);
+            }
+            else
+            {
+                if (tmp < R * R)
+                {
+                    ((CCircle)mylist.getObj(i)).Selected = true;
+                }
+            }
         }
         public CCircle(CCircle copy)
         {
-            x = copy.GetX();
-            y = copy.GetY();
+            x = copy.getX();
+            y = copy.getY();
         }
-        public int GetX()
+        public int getX()
         {
             return x;
         }
-        public int GetY()
+        public int getY()
         {
             return y;
         }
-        public int GetR()
+        public int getR()
         {
             return R;
         }
-        public void print(int x, int y)
-        {
-
-        }
-
     }
 
-    class DrawGraph
+    class Paint
     {
         Bitmap bitmap;
         Pen blackpen;
@@ -252,9 +264,9 @@ namespace OOP4._1
         Brush br;
         PointF point;
 
-        public int R = 20;
+        public int R = 15;
         
-        public DrawGraph(int width, int height)
+        public Paint(int width, int height)
         {
             bitmap = new Bitmap(width, height);
             gr = Graphics.FromImage(bitmap);
@@ -265,7 +277,7 @@ namespace OOP4._1
             redpen.Width = 2;
             darkGoldpen = new Pen(Color.DarkGoldenrod);
             darkGoldpen.Width = 2;
-            font_ = new Font("Arial", 15);
+            font_ = new Font("Arial", 10);
             br = Brushes.Black;
         }
 
@@ -293,11 +305,18 @@ namespace OOP4._1
         }
 
         public void PaintDraw(Mylist mylist)
+        //отрисовка всех объектов
         {
-            //отрисовка рёбер
-            for (int i = 0; i < mylist.getSize(); i++)
+            if (mylist.getSize() == 0) 
+                return;
+            for (int i = 1; i <=mylist.getSize(); i++)
             {
-                drawCircle(((CCircle)mylist.getObj(i)).GetX(),((CCircle)mylist.getObj(i)).GetY(),i.ToString());
+                R = ((CCircle)mylist.getObj(i)).getR();
+                drawCircle(((CCircle)mylist.getObj(i)).getX(),((CCircle)mylist.getObj(i)).getY(),(i-1).ToString());
+                if (((CCircle)mylist.getObj(i)).Selected)
+                {
+                    drawSelectedVert(((CCircle)mylist.getObj(i)).getX(), ((CCircle)mylist.getObj(i)).getY());
+                }
             }
             
         }
