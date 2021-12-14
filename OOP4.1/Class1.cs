@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Forms;
+using System.IO;
+using System.Drawing.Drawing2D;
 
 
 namespace OOP4._1
@@ -42,7 +47,7 @@ namespace OOP4._1
 
 
 
-    public class List
+    public class Mylist
     {
 
         public class Node
@@ -163,7 +168,7 @@ namespace OOP4._1
             return i;
         }
 
-        Base getObj(int i)
+        public Base getObj(int i)
         {
             if (isEmpty())
             {
@@ -182,7 +187,7 @@ namespace OOP4._1
             Console.WriteLine("\tОбъект передан\n");
             return (current.base_);
         }
-        Base getObjAndDelete(int i)
+        public Base getObjAndDelete(int i)
         {
             if (isEmpty())
             {
@@ -206,8 +211,9 @@ namespace OOP4._1
         private int R = 10;
         private new char code = 'C';
 
-        public CCircle(int x,int y)
+        public CCircle(int x, int y)
         {
+
             this.x = x;
             this.y = y;
         }
@@ -228,8 +234,73 @@ namespace OOP4._1
         {
             return R;
         }
+        public void print(int x, int y)
+        {
+
+        }
 
     }
 
+    class DrawGraph
+    {
+        Bitmap bitmap;
+        Pen blackpen;
+        Pen redpen;
+        Pen darkGoldpen;
+        Graphics gr;
+        Font font_;
+        Brush br;
+        PointF point;
 
+        public int R = 20;
+        
+        public DrawGraph(int width, int height)
+        {
+            bitmap = new Bitmap(width, height);
+            gr = Graphics.FromImage(bitmap);
+            clearSheet();
+            blackpen = new Pen(Color.Black);
+            blackpen.Width = 2;
+            redpen = new Pen(Color.Red);
+            redpen.Width = 2;
+            darkGoldpen = new Pen(Color.DarkGoldenrod);
+            darkGoldpen.Width = 2;
+            font_ = new Font("Arial", 15);
+            br = Brushes.Black;
+        }
+
+        public void clearSheet()
+        {
+            gr.Clear(Color.White);
+        }
+
+        public Bitmap GetBitmap()
+        {
+            return bitmap;
+        }
+
+        public void drawCircle(int x, int y, string Num)
+        {
+            gr.FillEllipse(Brushes.White, (x - R), (y - R), 2 * R, 2 * R);
+            gr.DrawEllipse(blackpen, (x - R), (y - R), 2 * R, 2 * R);
+            point = new PointF(x - (R / 2), y - (R / 2));
+            gr.DrawString(Num, font_, br, point);
+        }
+
+        public void drawSelectedVert(int x, int y)
+        {
+            gr.DrawEllipse(redpen, (x - R), (y - R), 2 * R, 2 * R);
+        }
+
+        public void PaintDraw(Mylist mylist)
+        {
+            //отрисовка рёбер
+            for (int i = 0; i < mylist.getSize(); i++)
+            {
+                drawCircle(((CCircle)mylist.getObj(i)).GetX(),((CCircle)mylist.getObj(i)).GetY(),i.ToString());
+            }
+            
+        }
+
+    }
 };
