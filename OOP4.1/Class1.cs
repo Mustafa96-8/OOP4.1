@@ -139,7 +139,8 @@ namespace OOP4._1
             if (first == null) return 0;
             Node node = first;
             int i = 1;
-            while (node!=null)
+            //было while (node!=null)
+            while (node.next!=null)
             {
                 i++;
                 node = node.next;
@@ -154,7 +155,7 @@ namespace OOP4._1
                 Console.WriteLine("Хранилище пусто, возвращать нечего\n");
                 return null;//исправить на исключение
             }
-            int j = 2;
+            int j = 0;
             Node current = first;
             //while (j < (i + 1) && !(current.isEOL())) {
             while (j < i && !(first.isEOL()))
@@ -214,17 +215,19 @@ namespace OOP4._1
             darkGoldpen.Width = 2;
             font_ = new Font("Arial", 10);
             br = Brushes.Black;
+            R = 20;
         }
 
-        public CCircle(int x, int y,Mylist mylist)
+        
+
+        public CCircle(int x, int y,Mylist mylist, bool isCTRL)
         {
 
             initcomp();
-            R = rand.Next(10, 40);
             bool flag = true;
             int i;
             double tmp = 0 ;
-            for ( i=1; i < mylist.getSize()+1; i++)
+            for ( i = 0; i < mylist.getSize(); i++)
             {
                 tmp = Math.Pow((((CCircle)mylist.getObj(i)).x - x), 2) + Math.Pow(((CCircle)mylist.getObj(i)).y - y, 2);
                 if (tmp <= (4*R*R))
@@ -238,37 +241,43 @@ namespace OOP4._1
             {
                 this.x = x;
                 this.y = y;
-                this.Selected = true;
+                RefreshSelectedCircles();
+                Selected = true;
                 mylist.add(this);
-                if (mylist.getSize() > 2)
-                {
-                    ((CCircle)mylist.getObj(mylist.getSize() - 1)).Selected = false;
-                }
             }
             else
             {
                 if (tmp < R * R)
                 {
-                    
+                    if (!isCTRL)
+                    {
+                        RefreshSelectedCircles();
+                    }
                     ((CCircle)mylist.getObj(i)).Selected = true;
+                }
+            }
+
+            void RefreshSelectedCircles()
+            {
+                for (int j = 0; j < mylist.getSize(); j++)
+                {
+                    ((CCircle)mylist.getObj(j)).Selected = false;
                 }
             }
         }
         public CCircle(CCircle copy)
         {
             initcomp();
-            br = Brushes.Black;
-            R = rand.Next(20, 20);
             x = copy.x;
             y = copy.y;
             Selected = copy.Selected;
         }
 
-        public void clearSheet(Graphics gr)
-        {
-            gr.Clear(Color.White);
-        }
 
+        public void deleteSelected(Mylist list)
+        {
+            if (Selected) list.deleteObj(this);
+        }
 
         public void drawCircle(int x, int y, string Num, Graphics gr)
         {
@@ -288,6 +297,7 @@ namespace OOP4._1
             if (Selected)
             {
                 drawSelectedVert(x,y,gr);
+                
             }
         }
     }
