@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Drawing;
 
 
-namespace OOP4._1
+namespace OOP4
 {
     public class Base
     {
@@ -34,8 +34,6 @@ namespace OOP4._1
 			return _base;
 		} 
 	}
-
-
 
     public class Mylist
     {
@@ -184,7 +182,6 @@ namespace OOP4._1
         }
     };
 
-
     public class CCircle : Base
     {
         
@@ -192,14 +189,9 @@ namespace OOP4._1
         Pen redpen;
         Pen darkGoldpen;
         
-        Font font_;
-        Brush br;
-        PointF point;
 
-
-        Random rand = new Random();
         private int x, y;
-        private int R=10;
+        private int R;
         public bool Selected;
         public override char getCode()
         {
@@ -213,12 +205,9 @@ namespace OOP4._1
             redpen.Width = 2;
             darkGoldpen = new Pen(Color.DarkGoldenrod);
             darkGoldpen.Width = 2;
-            font_ = new Font("Arial", 10);
-            br = Brushes.Black;
             R = 20;
         }
 
-        
 
         public CCircle(int x, int y,Mylist mylist, bool isCTRL)
         {
@@ -279,12 +268,10 @@ namespace OOP4._1
             if (Selected) list.deleteObj(this);
         }
 
-        public void drawCircle(int x, int y, string Num, Graphics gr)
+        public void drawCircle(int x, int y, Graphics gr)
         {
             gr.FillEllipse(Brushes.White, (x - R), (y - R), 2 * R, 2 * R);
             gr.DrawEllipse(blackpen, (x - R), (y - R), 2 * R, 2 * R);
-            point = new PointF(x - (R / 2), y - (R / 2));
-            gr.DrawString(Num, font_, br, point);
         }
         
         public void drawSelectedVert(int x, int y, Graphics gr)
@@ -293,11 +280,10 @@ namespace OOP4._1
         }
         public override void print(int i, Graphics gr) 
         {
-            drawCircle(x,y,(i+1).ToString(),gr);
+            drawCircle(x, y, gr);
             if (Selected)
             {
                 drawSelectedVert(x,y,gr);
-                
             }
         }
     }
